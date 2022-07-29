@@ -42,7 +42,7 @@
     },
     {
       "name": "Knit Master",
-      "setup": "sudo apt-get update; sudo apt-get remove -y r-base r-base-core; sudo apt-get install -y r-base r-base-core r-cran-digest r-cran-rmarkdown; rm -f -- 04_Master.html; R -e 'Sys.setenv(HOME = getwd()); Sys.getenv(\"HOME\")'; R -e 'rmarkdown::render(\"04_Master.Rmd\")'",
+      "setup": "sudo apt-get update; sudo apt-get remove -y r-base r-base-core; sudo apt-get install -y r-base r-base-core r-cran-digest r-cran-rmarkdown pandoc; rm -f -- 04_Master.html; R -e 'rmarkdown::render(\"04_Master.Rmd\")'",
       "run": "test -e 04_Master.html && echo 0 || echo 1",
       "input": "",
       "output": "0",
