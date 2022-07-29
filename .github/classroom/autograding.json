@@ -1,0 +1,54 @@
+{
+  "tests": [
+    {
+      "name": "01_download",
+      "setup": "",
+      "run": "test -e 01_download.NDVI.R && echo 0 || echo 1",
+      "input": "",
+      "output": "0",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 1
+    },
+    {
+      "name": "02_plot",
+      "setup": "",
+      "run": "test -e 02_plot.NDVI.R && echo 0 || echo 1",
+      "input": "",
+      "output": "0",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 1
+    },
+    {
+      "name": "03_negexp",
+      "setup": "",
+      "run": "test -e 03_negexp.R && echo 0 || echo 1",
+      "input": "",
+      "output": "0",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 1
+    },
+    {
+      "name": "04_master",
+      "setup": "",
+      "run": "test -e 04_Master.Rmd && echo 0 || echo 1",
+      "input": "",
+      "output": "0",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 1
+    },
+    {
+      "name": "Knit Master",
+      "setup": "sudo apt-get update; sudo apt-get remove -y r-base r-base-core; sudo apt-get install -y r-base r-base-core r-cran-digest pandoc; R -e 'install.packages(\"rmarkdown\"); rmarkdown::render(\"04_Master.Rmd\")'",
+      "run": "test -e 04_Master.html && echo 0 || echo 1",
+      "input": "",
+      "output": "0",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 1
+    }
+  ]
+}
