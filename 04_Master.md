@@ -1,17 +1,32 @@
+
+
+
+
+This report was automatically generated with the R package **knitr**
+(version 1.39).
+
+
+```r
 ---
 title: "Master script for postfire analysis"
 output: html_document
 ---
-
-```{r setup, include=FALSE}
-#knitr::opts_chunk$set(echo = TRUE)
 ```
+
+```
+## Error: <text>:6:0: unexpected end of input
+## 4: ---
+## 5: 
+##   ^
+```
+
 
 ### 1. Source functions, get data and plot
 
 First we'll _source()_ (i.e. "run all code in") the scripts with the functions we made. Then we'll set the URL, read in the data with _download.NDVI()_, and plot it with _plot.NDVI()_.
 
-```{r}
+
+```r
 ## Load required functions by running source() on the individual function files
 if(file.exists("01_download.NDVI.R")) source("01_download.NDVI.R")
 if(file.exists("02_plot.NDVI.R"))     source("02_plot.NDVI.R")
@@ -28,6 +43,8 @@ dat$age <- (as.numeric(dat$calendar_date) - min(as.numeric(dat$calendar_date), n
 plot.NDVI(dat)
 ```
 
+<img src="figure/04-Master-Rmdunnamed-chunk-1-1.png" title="plot of chunk unnamed-chunk-1" alt="plot of chunk unnamed-chunk-1" style="display: block; margin: auto;" />
+
 <br>
 
 Q1: This plot suggests that Fynbos greenness (NDVI) as observed from satellite saturates with time since fire. Why do you think it saturates rather than increasing linearly with time?
@@ -42,7 +59,8 @@ Now we'll fit the simple and full negative exponential models using Non-linear L
 
 First the simpler model:
 
-```{r}
+
+```r
 ## Simple model
 
 # set parameters
@@ -57,20 +75,42 @@ fit_negexp <- nls(NDVI ~ alpha + gamma * (1 - exp(- age/lambda)),
 plot.NDVI(dat = dat, fit = fit_negexp)
 ```
 
+<img src="figure/04-Master-Rmdunnamed-chunk-2-1.png" title="plot of chunk unnamed-chunk-2" alt="plot of chunk unnamed-chunk-2" style="display: block; margin: auto;" />
+
 <br>
 
 And let's look at the model summary with parameter estimates
 
-```{r}
+
+```r
 # print model summary
 summary(fit_negexp)
+```
+
+```
+## 
+## Formula: NDVI ~ alpha + gamma * (1 - exp(-age/lambda))
+## 
+## Parameters:
+##        Estimate Std. Error t value Pr(>|t|)    
+## alpha   0.25107    0.02887   8.695 1.04e-14 ***
+## gamma   0.32371    0.02723  11.887  < 2e-16 ***
+## lambda  1.17687    0.21396   5.500 1.84e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.07302 on 135 degrees of freedom
+## 
+## Number of iterations to convergence: 12 
+## Achieved convergence tolerance: 3.924e-06
 ```
 
 <br>
 
 Now the full model:
 
-```{r}
+
+```r
 ## Full model
 
 # set parameters
@@ -84,13 +124,36 @@ fit_negexpS <- nls(NDVI ~ alpha + gamma * (1 - exp(- age/lambda))
 
 # plot
 plot.NDVI(dat = dat, fit = fit_negexpS)
-
 ```
 
+<img src="figure/04-Master-Rmdunnamed-chunk-4-1.png" title="plot of chunk unnamed-chunk-4" alt="plot of chunk unnamed-chunk-4" style="display: block; margin: auto;" />
 
-```{r}
+
+
+```r
 # print model summary
 summary(fit_negexpS)
+```
+
+```
+## 
+## Formula: NDVI ~ alpha + gamma * (1 - exp(-age/lambda)) + A * sin(2 * pi * 
+##     age + (phi + pi/6 * (3 - 1)))
+## 
+## Parameters:
+##         Estimate Std. Error t value Pr(>|t|)    
+## alpha   0.207522   0.024948   8.318 9.31e-14 ***
+## gamma   0.364746   0.023926  15.245  < 2e-16 ***
+## lambda  0.989154   0.126064   7.846 1.25e-12 ***
+## A       0.063136   0.007114   8.875 4.12e-15 ***
+## phi    -0.839167   0.111887  -7.500 8.10e-12 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.05835 on 133 degrees of freedom
+## 
+## Number of iterations to convergence: 15 
+## Achieved convergence tolerance: 6.939e-06
 ```
 
 <br>
@@ -109,8 +172,21 @@ Modelers often want to know which of a set of models are better. One way to do t
 
 *i.e. one model is a subset of the other, as in our case
 
-```{r}
+
+```r
 anova(fit_negexp, fit_negexpS)
+```
+
+```
+## Analysis of Variance Table
+## 
+## Model 1: NDVI ~ alpha + gamma * (1 - exp(-age/lambda))
+## Model 2: NDVI ~ alpha + gamma * (1 - exp(-age/lambda)) + A * sin(2 * pi * age + (phi + pi/6 * (3 - 1)))
+##   Res.Df Res.Sum Sq Df  Sum Sq F value   Pr(>F)    
+## 1    135    0.71976                                
+## 2    133    0.45280  2 0.26696  39.207 4.12e-14 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 <br>
@@ -129,7 +205,8 @@ Q4: How many degrees of freedom are there in this ANOVA and why (i.e. what are t
 
 First let's fit the simpler model:
 
-```{r}
+
+```r
 ## Fit the simpler model using MLE
 
 # set parameters
@@ -140,22 +217,43 @@ fit_negexpMLE <- fit.negexp.MLE(dat, par)
 
 # plot
 plot.NDVI(dat)
-
 # add curve with MLE parameters
 lines(dat$age, pred.negexp(fit_negexpMLE$par,dat$age), col = 'skyblue', lwd = 3)
-
 ```
 
+<img src="figure/04-Master-Rmdunnamed-chunk-7-1.png" title="plot of chunk unnamed-chunk-7" alt="plot of chunk unnamed-chunk-7" style="display: block; margin: auto;" />
 
-```{r}
+
+
+```r
 fit_negexpMLE
+```
+
+```
+## $par
+##     alpha     gamma    lambda 
+## 0.2510442 0.3237419 1.1767370 
+## 
+## $value
+## [1] 359053.6
+## 
+## $counts
+## function gradient 
+##      118       NA 
+## 
+## $convergence
+## [1] 0
+## 
+## $message
+## NULL
 ```
 
 <br>
 
 Then the full model:
 
-```{r}
+
+```r
 ## Fit the full model using MLE
 
 # set parameters
@@ -170,8 +268,30 @@ plot.NDVI(dat)
 lines(dat$age, pred.negexpS(fit_negexpMLES$par,dat$age), col = 'skyblue', lwd = 3)
 ```
 
-```{r}
+<img src="figure/04-Master-Rmdunnamed-chunk-9-1.png" title="plot of chunk unnamed-chunk-9" alt="plot of chunk unnamed-chunk-9" style="display: block; margin: auto;" />
+
+
+```r
 fit_negexpMLES
+```
+
+```
+## $par
+##       alpha       gamma      lambda           A         phi 
+##  0.20772317  0.36449293  0.98919689  0.06310554 -0.83741663 
+## 
+## $value
+## [1] 225574.7
+## 
+## $counts
+## function gradient 
+##      914       NA 
+## 
+## $convergence
+## [1] 0
+## 
+## $message
+## NULL
 ```
 
 <br>
@@ -193,22 +313,38 @@ Where:
 
 Since we have our negative log likelihoods (i.e. $-ln(L)$ in the formula above), we can calculate the AICs and compare them.
 
-```{r}
+
+```r
 AIC_simple = 6 + 2*fit_negexpMLE$value
 
 AIC_simple
+```
 
+```
+## [1] 718113.1
+```
+
+```r
 AIC_full = 6 + 2*fit_negexpMLES$value
 
 AIC_full
+```
+
+```
+## [1] 451155.3
 ```
 
 <br>
 
 When comparing models, the lower the AIC the better, and in general a difference in AIC of 3 or more is analagous to the models being significantly different at an $\alpha$ of $p < 0.05$.
 
-```{r}
+
+```r
 AIC_simple - AIC_full
+```
+
+```
+## [1] 266957.8
 ```
 
 <br>
@@ -223,8 +359,15 @@ The nice thing about AIC is that the models you compare do not have to be nested
 
 Here are the AIC scores for our pair of NLS models:
 
-```{r}
+
+```r
 AIC(fit_negexp, fit_negexpS)
+```
+
+```
+##             df       AIC
+## fit_negexp   4 -325.7135
+## fit_negexpS  6 -385.6718
 ```
 
 <br>
@@ -236,3 +379,47 @@ Q6: Why is it not okay to compare the AIC of these NLS models with the AIC of th
 >*Answer 6:*
 
 <br>
+```
+
+The R session information (including the OS info, R version and all
+packages used):
+
+
+```r
+sessionInfo()
+```
+
+```
+## R version 4.2.1 (2022-06-23)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 20.04.4 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_ZA.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_ZA.UTF-8        LC_COLLATE=en_ZA.UTF-8    
+##  [5] LC_MONETARY=en_ZA.UTF-8    LC_MESSAGES=en_ZA.UTF-8   
+##  [7] LC_PAPER=en_ZA.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_ZA.UTF-8 LC_IDENTIFICATION=C       
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## loaded via a namespace (and not attached):
+## [1] compiler_4.2.1 magrittr_2.0.3 tools_4.2.1    stringi_1.7.6 
+## [5] highr_0.9      knitr_1.39     stringr_1.4.0  xfun_0.30     
+## [9] evaluate_0.15
+```
+
+```r
+Sys.time()
+```
+
+```
+## [1] "2022-07-29 22:56:32 SAST"
+```
+
