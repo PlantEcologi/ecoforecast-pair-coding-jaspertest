@@ -26,7 +26,7 @@ download.NDVI <- function(URL) {
     # Convert Digital Numbers (more efficient for data storage) to NDVI
     modat$NDVI <- modat$value*0.0001
     
-    # Convert calendar_date to class "Date"
+    # Convert calendar_date to class "Date" 
     modat$calendar_date <- as.Date(as.character(modat$calendar_date))
     
     # Return the data
