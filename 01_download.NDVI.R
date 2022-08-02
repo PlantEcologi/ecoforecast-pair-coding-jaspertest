@@ -29,7 +29,7 @@ download.NDVI <- function(URL) {
     # Convert calendar_date to class "Date" 
     modat$calendar_date <- as.Date(as.character(modat$calendar_date))
     
-    # Return the data hmm
+    # Return the data
     return(modat)
     
   } else {
